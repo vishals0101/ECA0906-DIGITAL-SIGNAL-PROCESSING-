@@ -1,0 +1,23 @@
+clc;
+clear;
+close all;
+
+% 1. Input Parameters
+fp = 1000;        % High-pass cutoff frequency (Hz)
+fs = 8000;        % Sampling frequency (Hz)
+N  = 50;          % Filter order
+
+% 2. Normalized Cutoff Frequency
+wc = fp/(fs/2);
+
+% 3. FIR High-Pass Filter using Hamming Window
+b_hamm = fir1(N, wc, 'high', hamming(N+1));
+
+% 4. Display Filter Coefficients
+disp('--- High-Pass Coefficients (Hamming Window) ---');
+disp(b_hamm');
+
+% 5. Plot Frequency Response
+figure;
+freqz(b_hamm, 1);
+title('High-Pass FIR using Hamming Window');
