@@ -1,0 +1,49 @@
+clc;
+clear;
+close all;
+
+% -------- FILTER SPECIFICATIONS --------
+Wp = 0.4;
+Ws = 0.55;
+Rp = 1;
+As = 40;
+
+% -------- FILTER ORDER CALCULATION --------
+[N, Wn] = cheb1ord(Wp, Ws, Rp, As);
+
+% -------- CHEBYSHEV TYPE-I FILTER DESIGN --------
+[b, a] = cheby1(N, Rp, Wn);
+
+% -------- DISPLAY FILTER PARAMETERS --------
+fprintf('Filter Order = %d\n', N);
+fprintf('Cutoff Frequency = %.2f * pi rad/sample\n', Wn);
+
+% -------- STABILITY CHECK --------
+if all(abs(roots(a)) < 1)
+    disp('System is STABLE');
+else
+    disp('System is UNSTABLE');
+end
+
+% -------- MAGNITUDE AND PHASE RESPONSE --------
+figure;
+freqz(b, a);
+title('Magnitude and Phase Response');
+
+% -------- IMPULSE RESPONSE --------
+figure;
+impz(b, a);
+title('Impulse Response');
+grid on;
+
+% -------- GROUP DELAY --------
+figure;
+grpdelay(b, a);
+title('Group Delay');
+grid on;
+
+% -------- POLE-ZERO PLOT --------
+figure;
+zplane(b, a);
+title('Pole-Zero Plot');
+grid on;
