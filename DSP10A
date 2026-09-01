@@ -1,0 +1,102 @@
+clc;
+clear;
+close all;
+
+%% Sampling Parameters
+Fs = 8000;
+t = 0:1/Fs:3;
+
+%% Clean Signal
+x = sin(2*pi*200*t) + 0.5*sin(2*pi*400*t);
+
+%% Add Noise
+noise = 0.3*randn(size(x));
+xn = x + noise;
+
+%% FFT of Noisy Signal
+Y = fft(xn);
+
+%% Estimate Noise Spectrum
+N = fft(noise);
+
+%% Spectral Subtraction
+magnitude_Y = abs(Y);
+phase_Y = angle(Y);
+
+magnitude_N = abs(N);
+
+% Subtract noise magnitude
+magnitude_E = max(magnitude_Y - magnitude_N, 0);
+
+% Reconstruct enhanced signal
+xe = real(ifft(magnitude_E .* exp(1j*phase_Y)));
+
+%% Signals
+figure;
+
+subplot(3,1,1);
+plot(t,x);
+grid on;
+title('Clean Speech');
+xlabel('Time (s)');
+ylabel('Amplitude');
+
+subplot(3,1,2);
+plot(t,xn);
+grid on;
+title('Noisy Speech');
+xlabel('Time (s)');
+ylabel('Amplitude');
+
+subplot(3,1,3);
+plot(t,xe);
+grid on;
+title('Enhanced Speech');
+xlabel('Time (s)');
+ylabel('Amplitude');
+
+%% Spectrograms
+figure;
+
+subplot(3,1,1);
+spectrogram(x,256,128,256,Fs,'yaxis');
+title('Clean Spectrogram');
+
+subplot(3,1,2);
+spectrogram(xn,256,128,256,Fs,'yaxis');
+title('Noisy Spectrogram');
+
+subplot(3,1,3);
+spectrogram(xe,256,128,256,Fs,'yaxis');
+title('Enhanced Spectrogram');
+
+%% Magnitude Spectra
+L = length(x);
+f = (0:L-1)*(Fs/L);
+
+X = abs(fft(x));
+XN = abs(fft(xn));
+XE = abs(fft(xe));
+
+figure;
+
+subplot(3,1,1);
+plot(f(1:L/2),X(1:L/2));
+grid on;
+title('Clean Spectrum');
+xlabel('Frequency (Hz)');
+ylabel('Magnitude');
+
+subplot(3,1,2);
+plot(f(1:L/2),XN(1:L/2));
+grid on;
+title('Noisy Spectrum');
+xlabel('Frequency (Hz)');
+ylabel('Magnitude');
+
+subplot(3,1,3);
+plot(f(1:L/2),XE(1:L/2));
+grid on;
+title('Enhanced Spectrum');
+xlabel('Frequency (Hz)');
+ylabel('Magnitude');
