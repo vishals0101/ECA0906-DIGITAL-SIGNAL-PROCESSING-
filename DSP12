@@ -1,0 +1,72 @@
+clc;
+clear;
+close all;
+
+%% Filter Specifications
+Fs = 43000;              % Sampling frequency = 43 kHz
+Fc = 2000;               % Cutoff frequency = 2 kHz
+N = 52;                  % Filter order
+
+%% Design FIR High-Pass Filter
+h = fir1(N, Fc/(Fs/2), 'high', rectwin(N+1));
+
+%% Display Filter Coefficients
+disp('FIR High-Pass Filter Coefficients:');
+disp(h);
+
+%% Generate Test Signal
+t = 0:1/Fs:0.02;
+
+% Low-frequency component + high-frequency component
+x = sin(2*pi*1000*t) + sin(2*pi*5000*t);
+
+%% Apply FIR Filter
+y = filter(h, 1, x);
+
+%% Time-Domain Output
+figure;
+
+subplot(2,1,1);
+plot(t, x, 'LineWidth', 1.2);
+grid on;
+title('Input Signal');
+xlabel('Time (s)');
+ylabel('Amplitude');
+
+subplot(2,1,2);
+plot(t, y, 'LineWidth', 1.2);
+grid on;
+title('High-Pass FIR Filter Output');
+xlabel('Time (s)');
+ylabel('Amplitude');
+
+%% Frequency Response
+figure;
+freqz(h, 1, 2048, Fs);
+title('52nd Order FIR High-Pass Filter');
+
+%% Input and Output Spectrum
+L = length(x);
+
+X = abs(fft(x));
+Y = abs(fft(y));
+
+f = (0:L-1)*Fs/L;
+
+figure;
+
+subplot(2,1,1);
+plot(f(1:floor(L/2)), X(1:floor(L/2)), 'LineWidth', 1.2);
+grid on;
+title('Input Signal Spectrum');
+xlabel('Frequency (Hz)');
+ylabel('Magnitude');
+xlim([0 10000]);
+
+subplot(2,1,2);
+plot(f(1:floor(L/2)), Y(1:floor(L/2)), 'LineWidth', 1.2);
+grid on;
+title('Filtered Signal Spectrum');
+xlabel('Frequency (Hz)');
+ylabel('Magnitude');
+xlim([0 10000]);
