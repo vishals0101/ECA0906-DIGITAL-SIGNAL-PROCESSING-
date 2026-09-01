@@ -1,0 +1,57 @@
+clc;
+clear;
+close all;
+
+%% Filter Specifications
+Fs = 62000;       % Sampling frequency = 62 kHz
+Fc = 4000;        % Cutoff frequency = 4 kHz
+N = 2;            % Filter order
+
+%% Butterworth Low Pass Filter
+[b,a] = butter(N, Fc/(Fs/2), 'low');
+
+%% Display Coefficients
+disp('Numerator coefficients (b):');
+disp(b);
+
+disp('Denominator coefficients (a):');
+disp(a);
+
+%% Generate Test Signal
+t = 0:1/Fs:0.01;
+
+x = sin(2*pi*1000*t) + ...
+    sin(2*pi*4000*t) + ...
+    sin(2*pi*10000*t);
+
+%% Apply Filter
+y = filter(b,a,x);
+
+%% Plot Input Signal
+figure;
+
+subplot(2,1,1);
+plot(t,x);
+grid on;
+title('Input Signal');
+xlabel('Time (s)');
+ylabel('Amplitude');
+
+%% Plot Filtered Signal
+subplot(2,1,2);
+plot(t,y);
+grid on;
+title('Butterworth Low-Pass Filter Output');
+xlabel('Time (s)');
+ylabel('Amplitude');
+
+%% Frequency Response
+figure;
+
+freqz(b,a,1024,Fs);
+title('2nd Order Butterworth Low-Pass Filter');
+
+%% Display Specifications
+fprintf('Sampling Frequency = %d Hz\n',Fs);
+fprintf('Cutoff Frequency   = %d Hz\n',Fc);
+fprintf('Filter Order       = %d\n',N);
